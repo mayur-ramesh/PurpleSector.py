@@ -10,11 +10,11 @@
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-hover: rgba(255, 255, 255, 0.15);
   
-  /* Primary Purple Accents (like Purple Sector UI) */
-  --color-primary: #9b59b6;
-  --color-primary-light: #c39bd3;
-  --color-primary-dark: #6c3483;
-  --color-primary-glow: rgba(155, 89, 182, 0.25);
+  /* Primary Neon Purple Accents */
+  --color-primary: #b026ff;
+  --color-primary-light: #d88aff;
+  --color-primary-dark: #6a10a3;
+  --color-primary-glow: rgba(176, 38, 255, 0.4);
   
   /* Text */
   --color-text: #f0f0f0;

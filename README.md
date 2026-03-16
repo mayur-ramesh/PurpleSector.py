@@ -1,10 +1,10 @@
-# 🟣 PurpleSector — F1 Qualifying Analysis
+# PurpleSector — F1 Qualifying Analysis
 
 > A multi-page interactive website for deep F1 qualifying analysis — telemetry battles, season-long qualifying gaps, and lap time ladders. Built with **FastF1** and **Streamlit**.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 PurpleSector/           ← Streamlit web app
@@ -26,15 +26,15 @@ assets/                 ← Generated charts and images
 
 ---
 
-## 🖥️ PurpleSector Web App
+## PurpleSector Web App
 
 ### Pages
 
 | Page | Description |
 |------|-------------|
-| 🏎️ **Qualifying Battle** | Speed, throttle & delta traces for any two drivers on their fastest lap. Sector gap metrics + corner annotations. |
-| 📊 **The Delta** | Season-long qualifying gap bar chart between two drivers. Uses deepest common session (Q3 → Q2 → Q1). Purple trend line overlay. |
-| ⏱️ **Lap Time Ladder** | All drivers ranked by personal best lap time, coloured by team. |
+| **Qualifying Battle** | Speed, throttle & delta traces for any two drivers on their fastest lap. Sector gap metrics + corner annotations. |
+| **The Delta** | Season-long qualifying gap bar chart between two drivers. Uses deepest common session (Q3 → Q2 → Q1). Purple trend line overlay. |
+| **Lap Time Ladder** | All drivers ranked by personal best lap time, coloured by team. |
 
 ### Setup & Run
 
@@ -63,7 +63,7 @@ Open **http://localhost:8501** in your browser.
 
 ---
 
-## 📜 Standalone Scripts
+## Standalone Scripts
 
 Each script in `scripts/` can be run independently. Configure the `YEAR`, `DRIVER_REF`, `DRIVER_COMP` variables at the top of each file.
 
@@ -74,7 +74,7 @@ python scripts/quali_analysis.py
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **[FastF1](https://theoehrly.github.io/Fast-F1/)** — F1 timing & telemetry data
 - **[Streamlit](https://streamlit.io/)** — interactive web UI
@@ -83,6 +83,6 @@ python scripts/quali_analysis.py
 
 ---
 
-## ⚠️ Data Disclaimer
+## Data Disclaimer
 
 All data is sourced from the FastF1 library, which pulls from the official F1 timing API. This project is a fan-made tool and is not affiliated with Formula 1, the FIA, or any team.

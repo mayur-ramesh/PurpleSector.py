@@ -12,7 +12,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
   const location = useLocation();
 
   const navItems = [
-    { path: '/', label: 'Qualifying Battle', icon: Trophy, color: '#9b59b6' },
+    { path: '/', label: 'Qualifying Battle', icon: Trophy, color: '#b026ff' },
     { path: '/delta', label: 'The Delta', icon: BarChart2, color: '#ff3333' },
     { path: '/laps', label: 'Lap Ladder', icon: Timer, color: '#ffd12b' },
     { path: '/tyres', label: 'Tyre Strategy', icon: Disc, color: '#e0e0e0' },
@@ -23,7 +23,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
     <div className={`sidebar ${isOpen ? 'open' : ''}`} style={{ padding: '2rem 1rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <h1 className="heading-gradient" style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '0.2rem' }}>
-          🟣 PurpleSector
+          @purplesector.py
         </h1>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', letterSpacing: '2px', textTransform: 'uppercase' }}>
           F1 Analytics

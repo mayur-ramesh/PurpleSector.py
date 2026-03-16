@@ -43,7 +43,7 @@ const TheDelta = () => {
   return (
     <div>
       <div style={{ borderLeft: '4px solid #ff3333', paddingLeft: '1rem', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>📊 The Delta</h2>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>The Delta</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
           Season-long qualifying gap between two drivers across all rounds.
         </p>
@@ -65,11 +65,11 @@ const TheDelta = () => {
           </div>
           <button type="submit" className="btn-premium" disabled={loading}
             style={{ marginLeft: '1rem', background: 'linear-gradient(135deg, #c0392b, #ff3333)' }}>
-            {loading ? 'Building Chart...' : '📊 Build Chart'}
+            {loading ? 'Building Chart...' : 'Build Chart'}
           </button>
         </form>
         <p style={{ marginTop: '0.75rem', fontSize: '0.78rem', color: '#555' }}>
-          ℹ️ Uses 3-digit driver codes (e.g. VER, NOR, HAM). Loading the full season may take 30–90 seconds.
+          Uses 3-digit driver codes (e.g. VER, NOR, HAM). Loading the full season may take 30–90 seconds.
         </p>
       </div>
 

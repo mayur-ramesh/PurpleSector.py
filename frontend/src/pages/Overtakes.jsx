@@ -33,7 +33,7 @@ const Overtakes = () => {
   return (
     <div>
       <div style={{ borderLeft: '4px solid #00aef0', paddingLeft: '1rem', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>🏆 Overtakes Leaderboard</h2>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Overtakes Leaderboard</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
           Most overtakes made in the 2025 season.
         </p>
@@ -43,7 +43,7 @@ const Overtakes = () => {
         <form onSubmit={handleAnalyze} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
           <button type="submit" className="btn-premium" disabled={loading}
             style={{ background: 'linear-gradient(135deg, #006fa3, #00aef0)', color: '#fff' }}>
-            {loading ? 'Loading...' : '🏁 Show Leaderboard'}
+            {loading ? 'Loading...' : 'Show Leaderboard'}
           </button>
         </form>
       </div>

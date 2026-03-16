@@ -16,7 +16,6 @@ const ErrorBanner = ({ message, onDismiss }) => {
       fontSize: '0.9rem',
       lineHeight: 1.5,
     }}>
-      <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>⚠️</span>
       <span style={{ flexGrow: 1 }}>{message}</span>
       {onDismiss && (
         <button

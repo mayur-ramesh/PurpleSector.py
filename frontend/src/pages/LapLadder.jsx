@@ -36,7 +36,7 @@ const LapLadder = () => {
   return (
     <div>
       <div style={{ borderLeft: '4px solid #ffd12b', paddingLeft: '1rem', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>⏱️ Lap Ladder</h2>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Lap Ladder</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
           All drivers' personal best lap times sorted by gap to P1.
         </p>
@@ -58,7 +58,7 @@ const LapLadder = () => {
           </div>
           <button type="submit" className="btn-premium" disabled={loading}
             style={{ marginLeft: '1rem', background: 'linear-gradient(135deg, #b8960a, #ffd12b)', color: '#111' }}>
-            {loading ? 'Processing...' : '⏱️ Build Ladder'}
+            {loading ? 'Processing...' : 'Build Ladder'}
           </button>
         </form>
       </div>
@@ -101,7 +101,7 @@ const LapLadder = () => {
                   gridTemplateColumns: '44px 64px 1fr 90px 100px',
                   gap: '0.5rem',
                   alignItems: 'center',
-                  background: idx === 0 ? 'rgba(155,89,182,0.07)' : 'rgba(255,255,255,0.02)',
+                  background: idx === 0 ? 'rgba(176,38,255,0.07)' : 'rgba(255,255,255,0.02)',
                   borderRadius: '6px',
                   padding: '0.5rem 0.4rem',
                   borderLeft: idx === 0 ? `3px solid ${lap.color}` : '3px solid transparent',

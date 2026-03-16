@@ -70,7 +70,7 @@ const QualiBattle = () => {
   return (
     <div>
       <div style={{ borderLeft: '4px solid var(--color-primary)', paddingLeft: '1rem', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>🏎️ Qualifying Battle</h2>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Qualifying Battle</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
           Compare fastest lap telemetry between any two drivers.
         </p>
@@ -99,7 +99,7 @@ const QualiBattle = () => {
             <input className="input-premium" type="text" value={d2} onChange={e => setD2(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="LEC" />
           </div>
           <button type="submit" className="btn-premium" disabled={loading} style={{ marginLeft: '1rem' }}>
-            {loading ? 'Analyzing...' : '⚡ Analyze'}
+            {loading ? 'Analyzing...' : 'Analyze'}
           </button>
         </form>
       </div>
