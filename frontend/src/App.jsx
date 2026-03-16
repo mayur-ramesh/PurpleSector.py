@@ -6,6 +6,7 @@ import TheDelta from './pages/TheDelta';
 import LapLadder from './pages/LapLadder';
 import TyreStrategy from './pages/TyreStrategy';
 import Overtakes from './pages/Overtakes';
+import RacePace from './pages/RacePace';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="delta" element={<TheDelta />} />
         <Route path="laps" element={<LapLadder />} />
         <Route path="tyres" element={<TyreStrategy />} />
+        <Route path="pace" element={<RacePace />} />
         <Route path="overtakes" element={<Overtakes />} />
       </Route>
     </Routes>

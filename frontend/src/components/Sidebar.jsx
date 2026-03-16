@@ -5,7 +5,8 @@ import {
   BarChart2, 
   Timer, 
   Disc, 
-  Flag 
+  Flag,
+  LineChart 
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, closeSidebar }) => {
@@ -14,6 +15,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
   const navItems = [
     { path: '/', label: 'Qualifying Battle', icon: Trophy, color: '#b026ff' },
     { path: '/delta', label: 'The Delta', icon: BarChart2, color: '#ff3333' },
+    { path: '/pace', label: 'Race Pace', icon: LineChart, color: '#39b54a' },
     { path: '/laps', label: 'Lap Ladder', icon: Timer, color: '#ffd12b' },
     { path: '/tyres', label: 'Tyre Strategy', icon: Disc, color: '#e0e0e0' },
     { path: '/overtakes', label: 'Overtakes', icon: Flag, color: '#00aef0' },
