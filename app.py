@@ -30,10 +30,10 @@ def main():
     npm_cmd = "npm.cmd" if is_windows else "npm"
 
     # 1. Start FastAPI Backend
-    print("⏳ Starting FastAPI Backend on port 8000...")
+    print("⏳ Starting FastAPI Backend on port 8008...")
     try:
         backend_process = subprocess.Popen(
-            [python_exe, "-m", "uvicorn", "main:app", "--port", "8000", "--host", "127.0.0.1", "--reload"],
+            [python_exe, "-m", "uvicorn", "main:app", "--port", "8008", "--host", "127.0.0.1", "--reload"],
             cwd=backend_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT
@@ -80,7 +80,7 @@ def main():
 
     print("\n✅ PurpleSector is successfully running!")
     print("👉 Frontend: http://localhost:5173")
-    print("👉 Backend API: http://localhost:8000")
+    print("👉 Backend API: http://localhost:8008")
     print("Press Ctrl+C to stop both servers.\n")
     
     try:
