@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Generated assets (charts / images — too large for git)
+assets/
+
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# FastF1 / data caches
+cache/
+f1_cache/
+*.pkl
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Media / large files
+*.mp4
+*.mov
+*.zip
+*.avif
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.log
