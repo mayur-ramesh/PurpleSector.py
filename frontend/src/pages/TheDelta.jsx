@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { DEFAULT_YEAR } from '../config';
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine, Cell
@@ -12,7 +13,7 @@ const TheDelta = () => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const [year, setYear] = useState(2024);
+  const [year, setYear] = useState(DEFAULT_YEAR);
   const [d1, setD1] = useState('VER');
   const [d2, setD2] = useState('NOR');
 

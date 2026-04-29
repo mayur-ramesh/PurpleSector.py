@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { DEFAULT_YEAR } from '../config';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import ErrorBanner from '../components/ErrorBanner';
 import Spinner from '../components/Spinner';
@@ -35,7 +36,7 @@ const Overtakes = () => {
       <div style={{ borderLeft: '4px solid #00aef0', paddingLeft: '1rem', marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Overtakes Leaderboard</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
-          Most overtakes made in the 2025 season.
+          Most overtakes made in the {DEFAULT_YEAR} season.
         </p>
       </div>
 
@@ -55,7 +56,7 @@ const Overtakes = () => {
       {data && !loading && (
         <div className="glass-card" style={{ padding: '2rem', height: '560px' }}>
           <h4 style={{ textAlign: 'center', color: '#ccc', marginBottom: '1rem' }}>
-            2025 Season — Overtakes Per Driver
+            {DEFAULT_YEAR} Season — Overtakes Per Driver
           </h4>
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={data.overtakes} margin={{ top: 25, right: 20, left: 0, bottom: 60 }}>

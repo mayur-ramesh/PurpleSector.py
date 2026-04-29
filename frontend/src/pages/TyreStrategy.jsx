@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { DEFAULT_YEAR } from '../config';
 import ErrorBanner from '../components/ErrorBanner';
 import Spinner from '../components/Spinner';
 
@@ -8,7 +9,7 @@ const TyreStrategy = () => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const [year, setYear] = useState(2024);
+  const [year, setYear] = useState(DEFAULT_YEAR);
   const [gp, setGp] = useState('Monaco');
   const [session, setSessionType] = useState('R');
 

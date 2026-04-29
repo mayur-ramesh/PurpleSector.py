@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import fastf1
-import os
+from pathlib import Path
 
 from api import telemetry, delta, laps, tyres, overtakes, race_pace
 
 # ─── CACHE SETUP ────────────────────────────────────────────────────────────
-F1_CACHE_DIR = r"C:\Temp\f1_cache"
-os.makedirs(F1_CACHE_DIR, exist_ok=True)
+F1_CACHE_DIR = Path.home() / ".fastf1_cache"
+F1_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 fastf1.Cache.enable_cache(F1_CACHE_DIR)
 
 app = FastAPI(title="PurpleSector API")

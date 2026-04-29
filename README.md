@@ -1,85 +1,94 @@
-# PurpleSector — F1 Qualifying Analysis
+# PurpleSector.py
 
-> A multi-page interactive website for deep F1 qualifying analysis — telemetry battles, season-long qualifying gaps, and lap time ladders. Built with **FastF1** and **Streamlit**.
-
----
-
-## Project Structure
-
-```
-PurpleSector/           ← Streamlit web app
-├── app.py              ← Main entry point (3-page app)
-├── requirements.txt    ← Python dependencies
-└── .streamlit/
-    └── config.toml     ← Server config
-
-scripts/                ← Standalone analysis scripts
-├── quali_analysis.py   ← Pole battle telemetry (matplotlib)
-├── delta_chart.py      ← Season-long qualifying gap bar chart
-├── tyre_analysis.py    ← Tyre strategy analysis
-├── overtakes.py        ← Overtake statistics
-├── lap_times.py        ← Lap time totals
-└── f1_insight_insta.py ← Instagram-format insight graphics
-
-assets/                 ← Generated charts and images
-```
+An interactive F1 analytics web app — explore telemetry, qualifying gaps, tyre strategies, and race pace for any season using live FastF1 data.
 
 ---
 
-## PurpleSector Web App
+## Prerequisites
 
-### Pages
+- **Python 3.10+**
+- **Node.js 18+** and npm
+
+---
+
+## Getting Started
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/mayur-ramesh/PurpleSector.py.git
+cd PurpleSector.py
+```
+
+### 2. Backend setup
+
+```bash
+# Create and activate a virtual environment
+python -m venv .venv
+
+# Windows
+.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r backend/requirements.txt
+
+# Start the API server
+cd backend
+uvicorn main:app --host 127.0.0.1 --port 8008 --reload
+```
+
+The API will be available at **http://localhost:8008**.
+
+### 3. Frontend setup
+
+In a separate terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The app will be available at **http://localhost:5173**.
+
+> **Tip:** You can also run both servers together from the repo root with `python app.py`.
+
+---
+
+## Environment Variables
+
+Copy `.env.example` to `.env` in the repo root and adjust as needed:
+
+```bash
+cp .env.example .env
+```
+
+See [.env.example](.env.example) for all available variables and their defaults. Currently the backend reads `BACKEND_HOST`, `BACKEND_PORT`, and `FASTF1_CACHE_DIR`; everything else falls back to a sensible default.
+
+---
+
+## Features
 
 | Page | Description |
 |------|-------------|
-| **Qualifying Battle** | Speed, throttle & delta traces for any two drivers on their fastest lap. Sector gap metrics + corner annotations. |
-| **The Delta** | Season-long qualifying gap bar chart between two drivers. Uses deepest common session (Q3 → Q2 → Q1). Purple trend line overlay. |
-| **Lap Time Ladder** | All drivers ranked by personal best lap time, coloured by team. |
-
-### Setup & Run
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/mayur-ramesh/The-Project.git
-cd The-Project
-
-# 2. Create a virtual environment
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # macOS / Linux
-
-# 3. Install dependencies
-pip install -r PurpleSector/requirements.txt
-
-# 4. Run the app
-# Important: use a local data dir to avoid OneDrive/network drive I/O issues
-$env:STREAMLIT_DATA_DIR="C:\Temp\streamlit_data"   # Windows PowerShell
-streamlit run PurpleSector/app.py
-```
-
-Open **http://localhost:8501** in your browser.
-
-> **Note on caching:** FastF1 session data is cached at `C:\Temp\f1_cache` by default. The first load of any session will take ~30–60 seconds while data downloads. Subsequent loads are instant.
-
----
-
-## Standalone Scripts
-
-Each script in `scripts/` can be run independently. Configure the `YEAR`, `DRIVER_REF`, `DRIVER_COMP` variables at the top of each file.
-
-```bash
-python scripts/delta_chart.py
-python scripts/quali_analysis.py
-```
+| **Qualifying Battle** | Side-by-side speed trace, throttle trace, and speed delta for any two drivers on their fastest lap. Includes sector gap cards and corner annotations. |
+| **The Delta** | Bar chart of the qualifying time gap between two drivers across every round of a season, with a polynomial trend line overlay. |
+| **Lap Ladder** | All drivers ranked by personal best lap time for a given session, with gap-to-P1 bars coloured by team. |
+| **Tyre Strategy** | Visualises pit stop timing and compound stints for the top 10 finishers across the full race distance. |
+| **Race Pace** | Compares clean-air race pace for up to three drivers lap-by-lap, with safety-car and outlier laps filtered out and a moving-average trend line. |
+| **Overtakes** | Leaderboard of overtakes made per driver across the current season. |
 
 ---
 
 ## Tech Stack
 
-- **[FastF1](https://theoehrly.github.io/Fast-F1/)** — F1 timing & telemetry data
-- **[Streamlit](https://streamlit.io/)** — interactive web UI
-- **Matplotlib** — all charting
-- **NumPy / Pandas** — data processing
+| Layer | Technology |
+|-------|-----------|
+| Data | [FastF1](https://theoehrly.github.io/Fast-F1/) |
+| Backend | [FastAPI](https://fastapi.tiangolo.com/), [Uvicorn](https://www.uvicorn.org/), Pandas, NumPy |
+| Frontend | [React 19](https://react.dev/), [Vite](https://vitejs.dev/), [Recharts](https://recharts.org/) |
 
 ---
 
