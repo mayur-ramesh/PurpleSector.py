@@ -1,36 +1,35 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import api from '../api';
 import { DEFAULT_YEAR } from '../config';
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine, Cell
 } from 'recharts';
 import ErrorBanner from '../components/ErrorBanner';
-import Spinner from '../components/Spinner';
+import StatusBar from '../components/StatusBar';
+import { SkeletonBarChart } from '../components/Skeleton';
 
 const TheDelta = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const [year, setYear] = useState(DEFAULT_YEAR);
-  const [d1, setD1] = useState('VER');
-  const [d2, setD2] = useState('NOR');
+  const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
+  const [d1, setD1] = useState(() => searchParams.get('d1') || 'VER');
+  const [d2, setD2] = useState(() => searchParams.get('d2') || 'NOR');
 
-  const handleAnalyze = async (e) => {
-    e.preventDefault();
+  const runAnalysis = async ({ year, d1, d2 }) => {
     setLoading(true);
     setError(null);
     setData(null);
     try {
-      const res = await axios.post('/api/delta/', {
-        year, ref_driver: d1, comp_driver: d2
-      });
-
+      const res = await api.post('/api/delta/', { year, ref_driver: d1, comp_driver: d2 });
       const bars = res.data.bars.map((b, i) => ({
         ...b,
         name: `R${b.round} ${b.race.substring(0, 3).toUpperCase()}`,
-        trend: res.data.trend.length > 0 ? res.data.trend[i] : undefined
+        trend: res.data.trend.length > 0 ? res.data.trend[i] : undefined,
       }));
       setData({ ...res.data, chartData: bars });
     } catch (err) {
@@ -41,8 +40,20 @@ const TheDelta = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (searchParams.toString()) runAnalysis({ year, d1, d2 });
+  }, []);
+
+  const handleAnalyze = (e) => {
+    e.preventDefault();
+    setSearchParams({ year: String(year), d1, d2 });
+    runAnalysis({ year, d1, d2 });
+  };
+
   return (
     <div>
+      <StatusBar loading={loading} message="Loading qualifying gaps for all rounds…" color="#ff3333" />
       <div style={{ borderLeft: '4px solid #ff3333', paddingLeft: '1rem', marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>The Delta</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
@@ -76,7 +87,7 @@ const TheDelta = () => {
 
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
-      {loading && <Spinner message="Loading qualifying data for every round… Please wait." color="#ff3333" />}
+      {loading && <SkeletonBarChart height="520px" />}
 
       {data && !loading && (
         <div className="glass-card" style={{ padding: '2rem', height: '520px' }}>

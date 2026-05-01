@@ -1,21 +1,25 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import api from '../api';
 import { DEFAULT_YEAR } from '../config';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import ErrorBanner from '../components/ErrorBanner';
-import Spinner from '../components/Spinner';
+import StatusBar from '../components/StatusBar';
+import { SkeletonBarChart } from '../components/Skeleton';
 
 const Overtakes = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleAnalyze = async (e) => {
-    e.preventDefault();
+  const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
+
+  const runAnalysis = async ({ year }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get('/api/overtakes/');
+      const res = await api.get(`/api/overtakes/${year}`);
       setData(res.data);
     } catch (err) {
       const detail = err.response?.data?.detail || err.message || 'Could not load data.';
@@ -23,6 +27,17 @@ const Overtakes = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (searchParams.toString()) runAnalysis({ year });
+  }, []);
+
+  const handleAnalyze = (e) => {
+    e.preventDefault();
+    setSearchParams({ year: String(year) });
+    runAnalysis({ year });
   };
 
   const CustomLabel = ({ x, y, width, value }) => (
@@ -33,15 +48,20 @@ const Overtakes = () => {
 
   return (
     <div>
+      <StatusBar loading={loading} message="Aggregating overtake data across completed rounds…" color="#00aef0" />
       <div style={{ borderLeft: '4px solid #00aef0', paddingLeft: '1rem', marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Overtakes Leaderboard</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
-          Most overtakes made in the {DEFAULT_YEAR} season.
+          Most overtakes made in the {year} season.
         </p>
       </div>
 
       <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
         <form onSubmit={handleAnalyze} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Year</label>
+            <input className="input-premium" type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} style={{ width: '90px' }} />
+          </div>
           <button type="submit" className="btn-premium" disabled={loading}
             style={{ background: 'linear-gradient(135deg, #006fa3, #00aef0)', color: '#fff' }}>
             {loading ? 'Loading...' : 'Show Leaderboard'}
@@ -51,18 +71,18 @@ const Overtakes = () => {
 
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
-      {loading && <Spinner message="Loading overtakes leaderboard…" color="#00aef0" />}
+      {loading && <SkeletonBarChart height="560px" />}
 
       {data && !loading && (
         <div className="glass-card" style={{ padding: '2rem', height: '560px' }}>
           <h4 style={{ textAlign: 'center', color: '#ccc', marginBottom: '1rem' }}>
-            {DEFAULT_YEAR} Season — Overtakes Per Driver
+            {data.year} Season — Overtakes Per Driver ({data.rounds_completed} rounds)
           </h4>
           <ResponsiveContainer width="100%" height="90%">
-            <BarChart data={data.overtakes} margin={{ top: 25, right: 20, left: 0, bottom: 60 }}>
+            <BarChart data={data.drivers} margin={{ top: 25, right: 20, left: 0, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
               <XAxis
-                dataKey="driver"
+                dataKey="driver_code"
                 angle={-45}
                 textAnchor="end"
                 height={70}
@@ -75,8 +95,8 @@ const Overtakes = () => {
                 itemStyle={{ color: '#fff', fontWeight: 'bold' }}
                 formatter={(val, name, props) => [val, props.payload.team]}
               />
-              <Bar dataKey="overtakes" radius={[4, 4, 0, 0]} label={<CustomLabel />}>
-                {data.overtakes.map((entry, index) => (
+              <Bar dataKey="overtakes_made" radius={[4, 4, 0, 0]} label={<CustomLabel />}>
+                {data.drivers.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color || '#444'} />
                 ))}
               </Bar>

@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import api from '../api';
 import { DEFAULT_YEAR } from '../config';
 import ErrorBanner from '../components/ErrorBanner';
-import Spinner from '../components/Spinner';
+import StatusBar from '../components/StatusBar';
+import { SkeletonTyreStrategy } from '../components/Skeleton';
 
 const TyreStrategy = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const [year, setYear] = useState(DEFAULT_YEAR);
-  const [gp, setGp] = useState('Monaco');
-  const [session, setSessionType] = useState('R');
+  const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
+  const [gp, setGp] = useState(() => searchParams.get('gp') || 'Monaco');
+  const [session, setSessionType] = useState(() => searchParams.get('session') || 'R');
 
-  const handleAnalyze = async (e) => {
-    e.preventDefault();
+  const runAnalysis = async ({ year, gp, session }) => {
     setLoading(true);
     setError(null);
     setData(null);
     try {
-      const res = await axios.post('/api/tyres/', {
-        year, gp, session_type: session
-      });
+      const res = await api.post('/api/tyres/', { year, gp, session_type: session });
       setData(res.data);
     } catch (err) {
       const detail = err.response?.data?.detail || err.message || 'Check the GP / year / session.';
@@ -31,6 +31,17 @@ const TyreStrategy = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (searchParams.toString()) runAnalysis({ year, gp, session });
+  }, []);
+
+  const handleAnalyze = (e) => {
+    e.preventDefault();
+    setSearchParams({ year: String(year), gp, session });
+    runAnalysis({ year, gp, session });
+  };
+
   const compoundLabel = {
     SOFT: 'S', MEDIUM: 'M', HARD: 'H',
     INTERMEDIATE: 'I', WET: 'W', UNKNOWN: '?'
@@ -38,6 +49,7 @@ const TyreStrategy = () => {
 
   return (
     <div>
+      <StatusBar loading={loading} message="Loading stint and tyre data…" color="#e0e0e0" />
       <div style={{ borderLeft: '4px solid #e0e0e0', paddingLeft: '1rem', marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Tyre Strategy</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
@@ -68,7 +80,7 @@ const TyreStrategy = () => {
 
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
-      {loading && <Spinner message="Loading stint data…" color="#e0e0e0" />}
+      {loading && <SkeletonTyreStrategy />}
 
       {data && !loading && (
         <div className="glass-card" style={{ padding: '2rem' }}>
@@ -76,7 +88,6 @@ const TyreStrategy = () => {
             {data.sessionName}
           </h4>
 
-          {/* Compound Legend */}
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
             {[['SOFT','#ff3333'],['MEDIUM','#ffd12b'],['HARD','#e0e0e0'],['INTERMEDIATE','#39b54a'],['WET','#00aef0']].map(([c, col]) => (
               <div key={c} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: '#aaa' }}>
@@ -87,7 +98,6 @@ const TyreStrategy = () => {
           </div>
 
           <div style={{ position: 'relative', paddingLeft: '60px', paddingTop: '10px' }}>
-            {/* Driver labels */}
             <div style={{ position: 'absolute', left: 0, top: '10px', bottom: 0, display: 'flex', flexDirection: 'column' }}>
               {data.drivers.map((driver, idx) => (
                 <div key={idx} style={{ height: '40px', display: 'flex', alignItems: 'center', fontWeight: 700, color: '#aaa', fontSize: '0.85rem' }}>
@@ -96,10 +106,7 @@ const TyreStrategy = () => {
               ))}
             </div>
 
-            {/* Grid canvas */}
             <div style={{ position: 'relative', width: '100%', height: `${data.drivers.length * 40}px`, background: 'rgba(255,255,255,0.02)', borderRadius: '4px' }}>
-
-              {/* Lap grid lines */}
               {[0.25, 0.5, 0.75, 1].map(frac => (
                 <div key={frac} style={{
                   position: 'absolute',
@@ -109,7 +116,6 @@ const TyreStrategy = () => {
                 }} />
               ))}
 
-              {/* Stint Bars */}
               {data.stints.map((stint, idx) => {
                 const width = (stint.duration / data.totalLaps) * 100;
                 const left = (stint.start / data.totalLaps) * 100;
@@ -143,7 +149,6 @@ const TyreStrategy = () => {
                 );
               })}
 
-              {/* Pit stop lap badges */}
               {data.pitStops.map((stop, idx) => (
                 <div key={`stop-${idx}`} style={{
                   position: 'absolute',
@@ -165,7 +170,6 @@ const TyreStrategy = () => {
               ))}
             </div>
 
-            {/* X-Axis */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', color: '#555', fontSize: '11px' }}>
               <span>Lap 1</span>
               <span>Lap {Math.floor(data.totalLaps / 2)}</span>

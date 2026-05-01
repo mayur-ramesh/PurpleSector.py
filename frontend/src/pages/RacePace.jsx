@@ -1,55 +1,53 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import api from '../api';
 import { DEFAULT_YEAR } from '../config';
 import {
   ComposedChart, Scatter, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import ErrorBanner from '../components/ErrorBanner';
-import Spinner from '../components/Spinner';
+import StatusBar from '../components/StatusBar';
+import { SkeletonLineChart } from '../components/Skeleton';
 
 const RacePace = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const [year, setYear] = useState(DEFAULT_YEAR);
-  const [gp, setGp] = useState('Monaco');
-  const [session, setSessionType] = useState('R');
-  const [d1, setD1] = useState('VER');
-  const [d2, setD2] = useState('NOR');
-  const [d3, setD3] = useState('LEC');
+  const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
+  const [gp, setGp] = useState(() => searchParams.get('gp') || 'Monaco');
+  const [session, setSessionType] = useState(() => searchParams.get('session') || 'R');
+  const [d1, setD1] = useState(() => searchParams.get('d1') || 'VER');
+  const [d2, setD2] = useState(() => searchParams.get('d2') || 'NOR');
+  const [d3, setD3] = useState(() => searchParams.get('d3') || 'LEC');
 
-  const handleAnalyze = async (e) => {
-    e.preventDefault();
+  const runAnalysis = async ({ year, gp, session, d1, d2, d3 }) => {
     setLoading(true);
     setError(null);
     setData(null);
     try {
-      const res = await axios.post('/api/race_pace/', {
-        year, gp, session_type: session, 
-        driver1: d1, driver2: d2, driver3: d3 || undefined
+      const res = await api.post('/api/race_pace/', {
+        year, gp, session_type: session,
+        driver1: d1, driver2: d2, driver3: d3 || undefined,
       });
-      
-      // Transform data for Recharts ComposedChart
-      // We need it in an array of objects where each object is a lap
+
       const chartData = [];
       const maxLength = Math.max(...res.data.drivers.map(d => d.laps.length), 0);
-      
-      // We will pivot the data: { lap: 1, VER_time: 80.5, VER_trend: 80.6, ... }
+
       for (let i = 0; i < maxLength; i++) {
-          const row = { lap: i + 1 };
-          res.data.drivers.forEach(driver => {
-              // Find the data point that corresponds to this lap number
-              const lapIdx = driver.laps.indexOf(i + 1);
-              if (lapIdx !== -1) {
-                  row[`${driver.name}_time`] = driver.times[lapIdx];
-                  row[`${driver.name}_trend`] = driver.trend[lapIdx];
-              }
-          });
-          chartData.push(row);
+        const row = { lap: i + 1 };
+        res.data.drivers.forEach(driver => {
+          const lapIdx = driver.laps.indexOf(i + 1);
+          if (lapIdx !== -1) {
+            row[`${driver.name}_time`] = driver.times[lapIdx];
+            row[`${driver.name}_trend`] = driver.trend[lapIdx];
+          }
+        });
+        chartData.push(row);
       }
-      
+
       setData({ ...res.data, chartData });
     } catch (err) {
       const detail = err.response?.data?.detail || err.message || 'Error loading race pace.';
@@ -59,13 +57,26 @@ const RacePace = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (searchParams.toString()) runAnalysis({ year, gp, session, d1, d2, d3 });
+  }, []);
+
+  const handleAnalyze = (e) => {
+    e.preventDefault();
+    const params = { year: String(year), gp, session, d1, d2 };
+    if (d3) params.d3 = d3;
+    setSearchParams(params);
+    runAnalysis({ year, gp, session, d1, d2, d3 });
+  };
+
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div style={{ backgroundColor: '#111', padding: '10px', border: '1px solid #333', borderRadius: '8px' }}>
           <p style={{ color: '#ccc', margin: '0 0 5px 0', fontSize: '12px' }}>Lap {label}</p>
           {payload.map((entry, index) => {
-            if (entry.dataKey.includes('_trend')) return null; // Only show scatter points in tooltip
+            if (entry.dataKey.includes('_trend')) return null;
             return (
               <p key={index} style={{ color: entry.color, margin: '2px 0', fontSize: '11px', fontWeight: 'bold' }}>
                 {entry.name.split('_')[0]}: {entry.value.toFixed(3)}s
@@ -80,8 +91,9 @@ const RacePace = () => {
 
   return (
     <div>
+      <StatusBar loading={loading} message="Downloading race laps and filtering outliers…" color="#39b54a" />
       <div style={{ borderLeft: '4px solid #39b54a', paddingLeft: '1rem', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>🏎️ Race Pace Analysis</h2>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Race Pace Analysis</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
           Compare true race pace and tyre degradation trends (outliers removed).
         </p>
@@ -118,7 +130,7 @@ const RacePace = () => {
 
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
-      {loading && <Spinner message="Downloading telemetry & filtering outliers... This takes ~30s." color="#39b54a" />}
+      {loading && <SkeletonLineChart height="520px" showLegend />}
 
       {data && !loading && (
         <div className="glass-card" style={{ padding: '2rem', height: '520px' }}>
@@ -132,7 +144,6 @@ const RacePace = () => {
               <YAxis domain={['auto', 'auto']} tick={{ fill: '#aaa', fontSize: 11 }} tickFormatter={(val) => `${val.toFixed(1)}s`} />
               <Tooltip content={<CustomTooltip />} />
               <Legend verticalAlign="top" height={36} iconType="circle" />
-              
               {data.drivers.map((driver) => [
                 <Scatter key={`scatter-${driver.name}`} name={`${driver.name}`} dataKey={`${driver.name}_time`} fill={driver.color} opacity={0.6} />,
                 <Line key={`line-${driver.name}`} name={`${driver.name} (Trend)`} type="monotone" dataKey={`${driver.name}_trend`} stroke={driver.color} strokeWidth={3} dot={false} activeDot={false} isAnimationActive={false} />

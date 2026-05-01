@@ -1,31 +1,33 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import api from '../api';
 import { DEFAULT_YEAR } from '../config';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine
 } from 'recharts';
 import ErrorBanner from '../components/ErrorBanner';
-import Spinner from '../components/Spinner';
+import StatusBar from '../components/StatusBar';
+import { SkeletonStatCards, SkeletonLineChart } from '../components/Skeleton';
 
 const QualiBattle = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const [year, setYear] = useState(DEFAULT_YEAR);
-  const [gp, setGp] = useState('Monaco');
-  const [session, setSessionType] = useState('Q');
-  const [d1, setD1] = useState('VER');
-  const [d2, setD2] = useState('LEC');
+  const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
+  const [gp, setGp] = useState(() => searchParams.get('gp') || 'Monaco');
+  const [session, setSessionType] = useState(() => searchParams.get('session') || 'Q');
+  const [d1, setD1] = useState(() => searchParams.get('d1') || 'VER');
+  const [d2, setD2] = useState(() => searchParams.get('d2') || 'LEC');
 
-  const handleAnalyze = async (e) => {
-    e.preventDefault();
+  const runAnalysis = async ({ year, gp, session, d1, d2 }) => {
     setLoading(true);
     setError(null);
     setData(null);
     try {
-      const res = await axios.post('/api/telemetry/', {
+      const res = await api.post('/api/telemetry/', {
         year, gp, session_type: session, driver1: d1, driver2: d2
       });
 
@@ -40,11 +42,9 @@ const QualiBattle = () => {
       for (let i = 0; i < dists.length; i++) {
         chartData.push({
           distance: dists[i],
-          speed1: s1[i],
-          speed2: s2[i],
-          throttle1: t1[i],
-          throttle2: t2[i],
-          delta: delta[i]
+          speed1: s1[i], speed2: s2[i],
+          throttle1: t1[i], throttle2: t2[i],
+          delta: delta[i],
         });
       }
       res.data.chartData = chartData;
@@ -57,7 +57,17 @@ const QualiBattle = () => {
     }
   };
 
-  // Safely format a time gap; guard against null/undefined
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (searchParams.toString()) runAnalysis({ year, gp, session, d1, d2 });
+  }, []);
+
+  const handleAnalyze = (e) => {
+    e.preventDefault();
+    setSearchParams({ year: String(year), gp, session, d1, d2 });
+    runAnalysis({ year, gp, session, d1, d2 });
+  };
+
   const fmt = (val) => {
     if (val == null || isNaN(val)) return 'N/A';
     return val > 0 ? `+${val.toFixed(3)}s` : `${val.toFixed(3)}s`;
@@ -70,6 +80,7 @@ const QualiBattle = () => {
 
   return (
     <div>
+      <StatusBar loading={loading} message="Fetching telemetry data…" color="var(--color-primary)" />
       <div style={{ borderLeft: '4px solid var(--color-primary)', paddingLeft: '1rem', marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Qualifying Battle</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
@@ -107,12 +118,17 @@ const QualiBattle = () => {
 
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
-      {loading && <Spinner message="Loading FastF1 cache… This may take up to 60s for new sessions." color="var(--color-primary)" />}
+      {loading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <SkeletonStatCards count={4} />
+          <SkeletonLineChart height="360px" showLegend />
+          <SkeletonLineChart height="220px" />
+        </div>
+      )}
 
       {data && !loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-          {/* Sector & Lap Gap Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
             <div className="glass-card" style={{ padding: '1.5rem', borderTop: `3px solid ${data.driver1.color}` }}>
               <p style={{ color: '#888', fontSize: '0.8rem', textTransform: 'uppercase' }}>Lap Gap</p>
@@ -137,7 +153,6 @@ const QualiBattle = () => {
             </div>
           </div>
 
-          {/* Speed Chart */}
           <div className="glass-card" style={{ padding: '2rem', height: '360px' }}>
             <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', alignItems: 'center' }}>
               <h4 style={{ color: '#ccc', margin: 0 }}>Speed (km/h)</h4>
@@ -169,7 +184,6 @@ const QualiBattle = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Delta Chart */}
           <div className="glass-card" style={{ padding: '2rem', height: '220px' }}>
             <h4 style={{ marginBottom: '0.5rem', color: '#ccc' }}>
               Speed Delta — <span style={{ color: data.driver1.color }}>(+) {data.driver1.name} faster</span> / <span style={{ color: data.driver2.color }}>(-) {data.driver2.name} faster</span>

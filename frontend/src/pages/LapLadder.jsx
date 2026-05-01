@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import api from '../api';
 import { DEFAULT_YEAR } from '../config';
 import ErrorBanner from '../components/ErrorBanner';
-import Spinner from '../components/Spinner';
+import StatusBar from '../components/StatusBar';
+import { SkeletonLapLadder } from '../components/Skeleton';
 
 const LapLadder = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const [year, setYear] = useState(DEFAULT_YEAR);
-  const [gp, setGp] = useState('Monaco');
-  const [session, setSessionType] = useState('Q');
+  const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
+  const [gp, setGp] = useState(() => searchParams.get('gp') || 'Monaco');
+  const [session, setSessionType] = useState(() => searchParams.get('session') || 'Q');
 
-  const handleAnalyze = async (e) => {
-    e.preventDefault();
+  const runAnalysis = async ({ year, gp, session }) => {
     setLoading(true);
     setError(null);
     setData(null);
     try {
-      const res = await axios.post('/api/laps/', {
-        year, gp, session_type: session
-      });
+      const res = await api.post('/api/laps/', { year, gp, session_type: session });
       setData(res.data);
     } catch (err) {
       const detail = err.response?.data?.detail || err.message || 'Unknown error. Check GP and year.';
@@ -31,11 +31,22 @@ const LapLadder = () => {
     }
   };
 
-  // Max gap for percentage bar scaling
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (searchParams.toString()) runAnalysis({ year, gp, session });
+  }, []);
+
+  const handleAnalyze = (e) => {
+    e.preventDefault();
+    setSearchParams({ year: String(year), gp, session });
+    runAnalysis({ year, gp, session });
+  };
+
   const maxGap = data ? Math.max(...data.laps.map(l => l.gapToP1), 0.001) : 1;
 
   return (
     <div>
+      <StatusBar loading={loading} message="Processing lap times…" color="#ffd12b" />
       <div style={{ borderLeft: '4px solid #ffd12b', paddingLeft: '1rem', marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Lap Ladder</h2>
         <p style={{ color: 'var(--color-text-muted)', margin: '0.3rem 0 0 0' }}>
@@ -66,7 +77,7 @@ const LapLadder = () => {
 
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
-      {loading && <Spinner message="Crunching lap times…" color="#ffd12b" />}
+      {loading && <SkeletonLapLadder />}
 
       {data && !loading && (
         <div className="glass-card" style={{ padding: '2rem' }}>
@@ -74,7 +85,6 @@ const LapLadder = () => {
             {data.sessionName}
           </h4>
 
-          {/* Header Row */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: '44px 64px 1fr 90px 100px',
@@ -114,8 +124,6 @@ const LapLadder = () => {
                   <div style={{ fontWeight: 800, color: lap.color, fontSize: '0.95rem' }}>
                     {lap.driver}
                   </div>
-
-                  {/* Proportional bar */}
                   <div style={{ position: 'relative', height: '20px', background: 'rgba(255,255,255,0.04)', borderRadius: '3px', overflow: 'hidden' }}>
                     {idx === 0 ? (
                       <div style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.7rem', color: '#ffd12b', fontWeight: 700, letterSpacing: '1px' }}>
@@ -131,7 +139,6 @@ const LapLadder = () => {
                       }} />
                     )}
                   </div>
-
                   <div style={{ textAlign: 'right', color: idx === 0 ? '#ffd12b' : '#aaa', fontWeight: 600, fontSize: '0.88rem' }}>
                     {idx === 0 ? '—' : `+${lap.gapToP1.toFixed(3)}s`}
                   </div>
