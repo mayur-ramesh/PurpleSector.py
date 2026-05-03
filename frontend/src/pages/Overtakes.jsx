@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { DEFAULT_YEAR } from '../config';
@@ -6,14 +6,23 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import ErrorBanner from '../components/ErrorBanner';
 import StatusBar from '../components/StatusBar';
 import { SkeletonBarChart } from '../components/Skeleton';
+import ChartExportButton from '../components/ChartExportButton';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Overtakes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const chartRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
   const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
+
+  useDocumentTitle(
+    data
+      ? `${year} Overtakes Leaderboard`
+      : 'Overtakes Leaderboard'
+  );
 
   const runAnalysis = async ({ year }) => {
     setLoading(true);
@@ -74,7 +83,8 @@ const Overtakes = () => {
       {loading && <SkeletonBarChart height="560px" />}
 
       {data && !loading && (
-        <div className="glass-card" style={{ padding: '2rem', height: '560px' }}>
+        <div ref={chartRef} className="glass-card" style={{ position: 'relative', padding: '2rem', height: '560px' }}>
+          <ChartExportButton targetRef={chartRef} filename={`purplesector-overtakes-${year}.png`} />
           <h4 style={{ textAlign: 'center', color: '#ccc', marginBottom: '1rem' }}>
             {data.year} Season — Overtakes Per Driver ({data.rounds_completed} rounds)
           </h4>

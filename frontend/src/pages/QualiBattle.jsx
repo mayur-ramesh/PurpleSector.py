@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { DEFAULT_YEAR } from '../config';
@@ -9,18 +9,22 @@ import {
 import ErrorBanner from '../components/ErrorBanner';
 import StatusBar from '../components/StatusBar';
 import { SkeletonStatCards, SkeletonLineChart } from '../components/Skeleton';
+import ChartExportButton from '../components/ChartExportButton';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const QualiBattle = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const speedChartRef = useRef(null);
+  const deltaChartRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
   const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
-  const [gp, setGp] = useState(() => searchParams.get('gp') || 'Monaco');
+  const [gp, setGp] = useState(() => searchParams.get('gp') || '');
   const [session, setSessionType] = useState(() => searchParams.get('session') || 'Q');
-  const [d1, setD1] = useState(() => searchParams.get('d1') || 'VER');
-  const [d2, setD2] = useState(() => searchParams.get('d2') || 'LEC');
+  const [d1, setD1] = useState(() => searchParams.get('d1') || '');
+  const [d2, setD2] = useState(() => searchParams.get('d2') || '');
 
   const runAnalysis = async ({ year, gp, session, d1, d2 }) => {
     setLoading(true);
@@ -68,6 +72,14 @@ const QualiBattle = () => {
     runAnalysis({ year, gp, session, d1, d2 });
   };
 
+  const slug = s => String(s).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+  useDocumentTitle(
+    data
+      ? `${data.driver1.name} vs ${data.driver2.name} — ${gp} ${session} ${year}`
+      : 'Qualifying Battle'
+  );
+
   const fmt = (val) => {
     if (val == null || isNaN(val)) return 'N/A';
     return val > 0 ? `+${val.toFixed(3)}s` : `${val.toFixed(3)}s`;
@@ -96,7 +108,7 @@ const QualiBattle = () => {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Grand Prix</label>
-            <input className="input-premium" type="text" value={gp} onChange={e => setGp(e.target.value)} placeholder="e.g. Monaco" />
+            <input className="input-premium" type="text" value={gp} onChange={e => setGp(e.target.value)} placeholder="e.g. Bahrain" />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Session</label>
@@ -104,11 +116,11 @@ const QualiBattle = () => {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginLeft: '1rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Driver 1</label>
-            <input className="input-premium" type="text" value={d1} onChange={e => setD1(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="VER" />
+            <input className="input-premium" type="text" value={d1} onChange={e => setD1(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="e.g. VER" />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Driver 2</label>
-            <input className="input-premium" type="text" value={d2} onChange={e => setD2(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="LEC" />
+            <input className="input-premium" type="text" value={d2} onChange={e => setD2(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="e.g. NOR" />
           </div>
           <button type="submit" className="btn-premium" disabled={loading} style={{ marginLeft: '1rem' }}>
             {loading ? 'Analyzing...' : 'Analyze'}
@@ -153,7 +165,8 @@ const QualiBattle = () => {
             </div>
           </div>
 
-          <div className="glass-card" style={{ padding: '2rem', height: '360px' }}>
+          <div ref={speedChartRef} className="glass-card" style={{ position: 'relative', padding: '2rem', height: '360px' }}>
+            <ChartExportButton targetRef={speedChartRef} filename={`purplesector-${slug(d1)}-${slug(d2)}-quali-speed-${slug(gp)}-${year}.png`} />
             <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', alignItems: 'center' }}>
               <h4 style={{ color: '#ccc', margin: 0 }}>Speed (km/h)</h4>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', color: data.driver1.color }}>
@@ -184,7 +197,8 @@ const QualiBattle = () => {
             </ResponsiveContainer>
           </div>
 
-          <div className="glass-card" style={{ padding: '2rem', height: '220px' }}>
+          <div ref={deltaChartRef} className="glass-card" style={{ position: 'relative', padding: '2rem', height: '220px' }}>
+            <ChartExportButton targetRef={deltaChartRef} filename={`purplesector-${slug(d1)}-${slug(d2)}-quali-delta-${slug(gp)}-${year}.png`} />
             <h4 style={{ marginBottom: '0.5rem', color: '#ccc' }}>
               Speed Delta — <span style={{ color: data.driver1.color }}>(+) {data.driver1.name} faster</span> / <span style={{ color: data.driver2.color }}>(-) {data.driver2.name} faster</span>
             </h4>

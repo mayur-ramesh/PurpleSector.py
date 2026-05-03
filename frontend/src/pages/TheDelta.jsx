@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { DEFAULT_YEAR } from '../config';
@@ -9,16 +9,26 @@ import {
 import ErrorBanner from '../components/ErrorBanner';
 import StatusBar from '../components/StatusBar';
 import { SkeletonBarChart } from '../components/Skeleton';
+import ChartExportButton from '../components/ChartExportButton';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const TheDelta = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const chartRef = useRef(null);
+  const slug = s => String(s).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
   const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
-  const [d1, setD1] = useState(() => searchParams.get('d1') || 'VER');
-  const [d2, setD2] = useState(() => searchParams.get('d2') || 'NOR');
+  const [d1, setD1] = useState(() => searchParams.get('d1') || '');
+  const [d2, setD2] = useState(() => searchParams.get('d2') || '');
+
+  useDocumentTitle(
+    data
+      ? `${d1} vs ${d2} Season Delta — ${year}`
+      : 'The Delta'
+  );
 
   const runAnalysis = async ({ year, d1, d2 }) => {
     setLoading(true);
@@ -69,11 +79,11 @@ const TheDelta = () => {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginLeft: '1rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Ref Driver</label>
-            <input className="input-premium" type="text" value={d1} onChange={e => setD1(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="VER" />
+            <input className="input-premium" type="text" value={d1} onChange={e => setD1(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="e.g. VER" />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Comp Driver</label>
-            <input className="input-premium" type="text" value={d2} onChange={e => setD2(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="NOR" />
+            <input className="input-premium" type="text" value={d2} onChange={e => setD2(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="e.g. NOR" />
           </div>
           <button type="submit" className="btn-premium" disabled={loading}
             style={{ marginLeft: '1rem', background: 'linear-gradient(135deg, #c0392b, #ff3333)' }}>
@@ -90,7 +100,8 @@ const TheDelta = () => {
       {loading && <SkeletonBarChart height="520px" />}
 
       {data && !loading && (
-        <div className="glass-card" style={{ padding: '2rem', height: '520px' }}>
+        <div ref={chartRef} className="glass-card" style={{ position: 'relative', padding: '2rem', height: '520px' }}>
+          <ChartExportButton targetRef={chartRef} filename={`purplesector-${slug(d1)}-${slug(d2)}-delta-${year}.png`} />
           <h4 style={{ marginBottom: '0.5rem', color: '#ccc', textAlign: 'center' }}>
             {year} Qualifying Gap — {data.ref_driver} vs {data.comp_driver}
           </h4>

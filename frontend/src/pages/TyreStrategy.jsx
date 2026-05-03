@@ -1,20 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { DEFAULT_YEAR } from '../config';
 import ErrorBanner from '../components/ErrorBanner';
 import StatusBar from '../components/StatusBar';
 import { SkeletonTyreStrategy } from '../components/Skeleton';
+import ChartExportButton from '../components/ChartExportButton';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const TyreStrategy = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const chartRef = useRef(null);
+  const slug = s => String(s).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
   const [year, setYear] = useState(() => parseInt(searchParams.get('year')) || DEFAULT_YEAR);
-  const [gp, setGp] = useState(() => searchParams.get('gp') || 'Monaco');
+  const [gp, setGp] = useState(() => searchParams.get('gp') || '');
   const [session, setSessionType] = useState(() => searchParams.get('session') || 'R');
+
+  useDocumentTitle(
+    data
+      ? `${data.sessionName} Tyre Strategy`
+      : 'Tyre Strategy'
+  );
 
   const runAnalysis = async ({ year, gp, session }) => {
     setLoading(true);
@@ -65,7 +75,7 @@ const TyreStrategy = () => {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Grand Prix</label>
-            <input className="input-premium" type="text" value={gp} onChange={e => setGp(e.target.value)} placeholder="e.g. Monaco" />
+            <input className="input-premium" type="text" value={gp} onChange={e => setGp(e.target.value)} placeholder="e.g. Bahrain" />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Session</label>
@@ -83,7 +93,8 @@ const TyreStrategy = () => {
       {loading && <SkeletonTyreStrategy />}
 
       {data && !loading && (
-        <div className="glass-card" style={{ padding: '2rem' }}>
+        <div ref={chartRef} className="glass-card" style={{ position: 'relative', padding: '2rem' }}>
+          <ChartExportButton targetRef={chartRef} filename={`purplesector-tyres-${slug(gp)}-${slug(session)}-${year}.png`} />
           <h4 style={{ marginBottom: '2rem', color: '#ccc', textAlign: 'center' }}>
             {data.sessionName}
           </h4>
