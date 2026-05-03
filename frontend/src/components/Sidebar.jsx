@@ -24,7 +24,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`} style={{ padding: '2rem 1rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 className="heading-gradient" style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '0.2rem' }}>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '0.2rem', fontFamily: 'Consolas, "Courier New", monospace', color: '#b026ff' }}>
           @purplesector.py
         </h1>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', letterSpacing: '2px', textTransform: 'uppercase' }}>
