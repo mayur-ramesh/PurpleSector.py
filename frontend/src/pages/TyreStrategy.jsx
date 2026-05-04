@@ -68,16 +68,16 @@ const TyreStrategy = () => {
       </div>
 
       <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
-        <form onSubmit={handleAnalyze} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        <form className="filter-form" onSubmit={handleAnalyze}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Year</label>
             <input className="input-premium" type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} style={{ width: '90px' }} />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Grand Prix</label>
             <input className="input-premium" type="text" value={gp} onChange={e => setGp(e.target.value)} placeholder="e.g. Bahrain" />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Session</label>
             <input className="input-premium" type="text" value={session} onChange={e => setSessionType(e.target.value)} style={{ width: '70px' }} placeholder="R" />
           </div>

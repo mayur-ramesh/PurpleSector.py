@@ -326,6 +326,74 @@ body {
   .status-bar { margin: -3.5rem -0.75rem 1.5rem; }
 }
 
+/* ── Responsive form utilities ───────────────────────────────────────────────── */
+.filter-form {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* ── Responsive chart containers ─────────────────────────────────────────────── */
+/* Pages set height inline; these !important overrides kick in on small screens  */
+@media (max-width: 768px) {
+  .chart-card {
+    height: 400px !important;
+    padding: 1.25rem !important;
+    padding-bottom: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-card {
+    height: 320px !important;
+  }
+}
+
+/* ── Mobile form: stack fields vertically ─────────────────────────────────────── */
+@media (max-width: 640px) {
+  .filter-form {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .filter-field {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .filter-field .input-premium {
+    width: 100% !important;
+  }
+
+  .filter-form .btn-premium {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 0.25rem;
+  }
+
+  /* No hover lift on touch screens */
+  .glass-card:hover {
+    transform: none !important;
+  }
+
+  /* Lap Ladder: drop the lap-time column, tighten fixed columns */
+  .lap-ladder-header,
+  .lap-ladder-row {
+    grid-template-columns: 36px 52px 1fr 76px !important;
+  }
+
+  .lap-time-cell {
+    display: none !important;
+  }
+}
+
 /* ── Chart export button ─────────────────────────────────────────────────────── */
 .chart-export-btn {
   position: absolute;

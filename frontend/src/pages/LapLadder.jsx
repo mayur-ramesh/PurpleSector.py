@@ -65,16 +65,16 @@ const LapLadder = () => {
       </div>
 
       <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
-        <form onSubmit={handleAnalyze} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        <form className="filter-form" onSubmit={handleAnalyze}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Year</label>
             <input className="input-premium" type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} style={{ width: '90px' }} />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Grand Prix</label>
             <input className="input-premium" type="text" value={gp} onChange={e => setGp(e.target.value)} placeholder="e.g. Bahrain" />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Session</label>
             <input className="input-premium" type="text" value={session} onChange={e => setSessionType(e.target.value)} style={{ width: '70px' }} placeholder="Q / R" />
           </div>
@@ -96,7 +96,7 @@ const LapLadder = () => {
             {data.sessionName}
           </h4>
 
-          <div style={{
+          <div className="lap-ladder-header" style={{
             display: 'grid',
             gridTemplateColumns: '44px 64px 1fr 90px 100px',
             gap: '0.5rem',
@@ -111,14 +111,14 @@ const LapLadder = () => {
             <span>Driver</span>
             <span>Gap Bar</span>
             <span style={{ textAlign: 'right' }}>Gap</span>
-            <span style={{ textAlign: 'right' }}>Lap Time</span>
+            <span className="lap-time-cell" style={{ textAlign: 'right' }}>Lap Time</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.5rem' }}>
             {data.laps.map((lap, idx) => {
               const barPct = idx === 0 ? 0 : Math.min((lap.gapToP1 / maxGap) * 100, 100);
               return (
-                <div key={idx} style={{
+                <div key={idx} className="lap-ladder-row" style={{
                   display: 'grid',
                   gridTemplateColumns: '44px 64px 1fr 90px 100px',
                   gap: '0.5rem',
@@ -153,7 +153,7 @@ const LapLadder = () => {
                   <div style={{ textAlign: 'right', color: idx === 0 ? '#ffd12b' : '#aaa', fontWeight: 600, fontSize: '0.88rem' }}>
                     {idx === 0 ? '—' : `+${lap.gapToP1.toFixed(3)}s`}
                   </div>
-                  <div style={{ textAlign: 'right', color: '#ddd', fontFamily: 'monospace', fontSize: '0.88rem' }}>
+                  <div className="lap-time-cell" style={{ textAlign: 'right', color: '#ddd', fontFamily: 'monospace', fontSize: '0.88rem' }}>
                     {lap.lapTimeFormatted || `${lap.lapTimeS.toFixed(3)}s`}
                   </div>
                 </div>

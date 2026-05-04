@@ -101,24 +101,24 @@ const QualiBattle = () => {
       </div>
 
       <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
-        <form onSubmit={handleAnalyze} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        <form className="filter-form" onSubmit={handleAnalyze}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Year</label>
             <input className="input-premium" type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} style={{ width: '90px' }} />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Grand Prix</label>
             <input className="input-premium" type="text" value={gp} onChange={e => setGp(e.target.value)} placeholder="e.g. Bahrain" />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Session</label>
             <input className="input-premium" type="text" value={session} onChange={e => setSessionType(e.target.value)} style={{ width: '70px' }} placeholder="Q / R" />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginLeft: '1rem' }}>
+          <div className="filter-field" style={{ marginLeft: '1rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Driver 1</label>
             <input className="input-premium" type="text" value={d1} onChange={e => setD1(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="e.g. VER" />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Driver 2</label>
             <input className="input-premium" type="text" value={d2} onChange={e => setD2(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="e.g. NOR" />
           </div>
@@ -165,7 +165,7 @@ const QualiBattle = () => {
             </div>
           </div>
 
-          <div ref={speedChartRef} className="glass-card" style={{ position: 'relative', padding: '2rem', height: '360px' }}>
+          <div ref={speedChartRef} className="glass-card chart-card" style={{ position: 'relative', padding: '2rem', height: '360px' }}>
             <ChartExportButton targetRef={speedChartRef} filename={`purplesector-${slug(d1)}-${slug(d2)}-quali-speed-${slug(gp)}-${year}.png`} />
             <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', alignItems: 'center' }}>
               <h4 style={{ color: '#ccc', margin: 0 }}>Speed (km/h)</h4>

@@ -72,16 +72,16 @@ const TheDelta = () => {
       </div>
 
       <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
-        <form onSubmit={handleAnalyze} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        <form className="filter-form" onSubmit={handleAnalyze}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Year</label>
             <input className="input-premium" type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} style={{ width: '90px' }} />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginLeft: '1rem' }}>
+          <div className="filter-field" style={{ marginLeft: '1rem' }}>
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Ref Driver</label>
             <input className="input-premium" type="text" value={d1} onChange={e => setD1(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="e.g. VER" />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Comp Driver</label>
             <input className="input-premium" type="text" value={d2} onChange={e => setD2(e.target.value.toUpperCase())} style={{ width: '80px' }} placeholder="e.g. NOR" />
           </div>
@@ -100,7 +100,7 @@ const TheDelta = () => {
       {loading && <SkeletonBarChart height="520px" />}
 
       {data && !loading && (
-        <div ref={chartRef} className="glass-card" style={{ position: 'relative', padding: '2rem', height: '520px' }}>
+        <div ref={chartRef} className="glass-card chart-card" style={{ position: 'relative', padding: '2rem', height: '520px' }}>
           <ChartExportButton targetRef={chartRef} filename={`purplesector-${slug(d1)}-${slug(d2)}-delta-${year}.png`} />
           <h4 style={{ marginBottom: '0.5rem', color: '#ccc', textAlign: 'center' }}>
             {year} Qualifying Gap — {data.ref_driver} vs {data.comp_driver}

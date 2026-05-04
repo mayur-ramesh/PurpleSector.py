@@ -66,8 +66,8 @@ const Overtakes = () => {
       </div>
 
       <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
-        <form onSubmit={handleAnalyze} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        <form className="filter-form" onSubmit={handleAnalyze}>
+          <div className="filter-field">
             <label style={{ fontSize: '0.8rem', color: '#888', textTransform: 'uppercase' }}>Year</label>
             <input className="input-premium" type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} style={{ width: '90px' }} />
           </div>
@@ -83,7 +83,7 @@ const Overtakes = () => {
       {loading && <SkeletonBarChart height="560px" />}
 
       {data && !loading && (
-        <div ref={chartRef} className="glass-card" style={{ position: 'relative', padding: '2rem', height: '560px' }}>
+        <div ref={chartRef} className="glass-card chart-card" style={{ position: 'relative', padding: '2rem', height: '560px' }}>
           <ChartExportButton targetRef={chartRef} filename={`purplesector-overtakes-${year}.png`} />
           <h4 style={{ textAlign: 'center', color: '#ccc', marginBottom: '1rem' }}>
             {data.year} Season — Overtakes Per Driver ({data.rounds_completed} rounds)
